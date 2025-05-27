@@ -76,3 +76,41 @@ no se necesita una funcion main
  var investmentAmount, years float64 = 1000, 10
 
  todas tiene que ser del mismo tipo de dato
+
+ const para declarar constantes
+
+ & --> para declarar punteros
+
+ las funciones como scan necesitan un parametro del tipo puntero
+
+	investmentAmount := 0.0
+	fmt.Println("please specify an investmentAmount")
+	fmt.Scan(&investmentAmount)
+
+
+asi se declara sin setear un valor
+
+var investmentAmount float64
+
+////////////////////////////////////////////
+
+manejo de strings
+
+se puede hacer una salida por pantalla usando el format
+fmt.Printf("Future VAlue (adjusted for Inflation): %v", futureRealValue)
+
+%v value
+%T type
+%#v value representacion tipo go-sintax del valor
+
+
+para formatear una salida pero no mostrarla por pantalla
+se puede usar fmt.Sprint()
+de la siguiente forma
+
+result := fmt.Sprint()
+
+
+string de multiples lineas
+
+se usa eso `` ---> back tick
