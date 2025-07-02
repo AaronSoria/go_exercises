@@ -1,0 +1,244 @@
+key components
+value & types
+functions
+Control Structures
+
+
+
+key components
+
+package section
+import section
+main function
+
+
+un paquete por aplicacion almenos
+puede incluir mas de uno
+ayuda a organizar el codigo
+
+ayuda a importar funcionalidades de otro
+paquetes
+
+esta la standar library
+que tiene dentro los paquetes
+
+el uso de "main"
+se puedo usar cualquier nombre
+
+pero main es el entry point que le 
+dice a go donde iniciar
+
+para haceer un buil primero se necesita crear un modulo
+
+go mod init example.com/nombre
+go build ===> para hacer un ejecutable
+
+
+si cambiamos main por app o lo que sea
+y hacemos un buil no se genera el ejecutable
+porque go no encuentra el entrypoint
+
+
+la funcion tambien tiene que llamarse main
+porque go tambien llamara a esa funcion
+dentro del paquete main
+
+no se puede repetir el nombre en otro
+archivo porque produce error y sabe
+a cual llamara
+
+si estamos por haacer una libreria
+no se necesita una funcion main
+ //////////////////////////////////////
+
+ values & types
+
+ para los archivos se usa _ para separar
+ nombres. para los modulos como go.mod
+ adentro se se usa -
+
+
+ para variables se usa lowerCamelCase
+ para declarar se usa var
+
+ para declarar el tipo de dato se hace de la siguiente manera
+
+ var investmentAmount float64 = 1000
+
+ si estamos conformes con el tipo de dato inferido por
+ go se puede usar
+
+ expectedRate := 5.5
+
+ y esto asumira que el valor es float64
+
+ se puede declarar multiples variables en un mismo renglon
+ var investmentAmount, years float64 = 1000, 10
+
+ todas tiene que ser del mismo tipo de dato
+
+ const para declarar constantes
+
+ & --> para declarar punteros
+
+ las funciones como scan necesitan un parametro del tipo puntero
+
+	investmentAmount := 0.0
+	fmt.Println("please specify an investmentAmount")
+	fmt.Scan(&investmentAmount)
+
+
+asi se declara sin setear un valor
+
+var investmentAmount float64
+
+////////////////////////////////////////////
+
+manejo de strings
+
+se puede hacer una salida por pantalla usando el format
+fmt.Printf("Future VAlue (adjusted for Inflation): %v", futureRealValue)
+
+%v value
+%T type
+%#v value representacion tipo go-sintax del valor
+
+
+para formatear una salida pero no mostrarla por pantalla
+se puede usar fmt.Sprint()
+de la siguiente forma
+
+result := fmt.Sprint()
+
+
+string de multiples lineas
+
+se usa eso `` ---> back tick
+
+palabras reservadas para declarar funciones:
+func
+
+
+func outputText(text string)
+
+func outputText(text1, text2 string)
+
+
+asi se declara cuando quiero devolver un valor o mas
+func calculateFutureValue(investmentAmount float64, expectedReturnRate float64, inflationRate float64, years float64) (float64, float64) {
+	futureValue := investmentAmount * math.Pow((1+(expectedReturnRate/100)), years)
+	futureRealValue := futureValue / math.Pow(1+inflationRate/100, years)
+	return futureValue, futureRealValue
+}
+
+
+de forma alternativa se puede declarar los parametros que se
+van a regresaae, usando la siguiente firma
+func calculateFutureValue(investmentAmount float64, expectedReturnRate float64, inflationRate float64, years float64) (fv float64, frv float64) {
+	fv = investmentAmount * math.Pow((1+(expectedReturnRate/100)), years)
+	frv = fv / math.Pow(1+inflationRate/100, years)
+	return
+}
+
+
+
+/////////////////////// estructuras de control
+
+if else es igual que los otros lenguajes
+
+existe un unico bucle y es el for
+
+for i:= 1; i < 2; i++ { //// for loop tradicional
+...
+}
+
+for {
+	....
+} //// for loop infinito
+
+para salir del for se puede usar la palabra
+break;
+
+se puede usar 
+continue
+para poder seguir con la siguiente iteracion
+
+
+for someCondition {  /// for loop condicional
+....
+}
+
+
+
+switch igual a de los otros lenguajes
+
+
+un switch dentro de un for confunde el break, por lo que toma el break como si fuera del switch
+
+
+//// manejo de archivos
+
+import "os"
+ayuda con el manejo de archivos del filesystem
+tambien parace que ayuda a recibir parametros desde la consola
+ejemplo:
+
+func writeBalanceToFile(accountBalance float64) {
+	balanceText := fmt.Sprint(accountBalance) /// ---> con esto lo volvemos un string que es mas facil de manejar
+	os.WriteFile("balance.txt", []byte(balanceText), 0644) /// 0644 son los permisos de lectura y escritura
+}
+
+
+para leer un archivo
+
+func getBalanceFromFile() float64 {
+	data, _ := os.ReadFile(accountBalanceFile) /// la funcion devuelve el contenido en un array de bytes. Tambien devuelve el error, pero si no lo usamos se puede ignorar usando _
+	balanceText := string(data) /// convertimos el array de bytes a string usando la funcion string del paquete import "strconv"
+	balance, _ := strconv.ParseFloat(balanceText, 64) // conveertimos el string en float64, y tambien devuelve el error pero lo ignoramos
+	return balance
+}
+
+
+
+///// gestion de errores
+en go funciona diferente
+las funciiones se escribe de forma tal que no bloqueen la aplicacion
+por ejemplo, en caso de error se devuelve un valor por defecto
+
+tambien se puede devolver un valor por defecto y un error 
+ejemplo
+
+import "errors"
+
+func getBalanceFromFile() (float64, error) {
+....
+}
+
+
+func getBalanceFromFile() (float64, error) {
+	data, err := os.ReadFile(accountBalanceFile)
+
+	if err != nil {
+		return 0, errors.New("fail to read file") /// aqui creamos un error y lo devolvemos
+	}
+	balanceText := string(data)
+	balance, err := strconv.ParseFloat(balanceText, 64)
+
+	if err != nil {
+		return 0, errors.New("fail to parse value") /// aqui creamos un error y lo devolvemos
+	}
+	return balance, nil /// aqui no hay error y devolvemos nul
+}
+
+cuando se quiere detener la aplicacion por un error
+se utiliza la funcion panic
+
+func main() {
+	// var accountBalance float64 = 1000.0
+	accountBalance, err := getBalanceFromFile()
+	if err != nil {
+		fmt.Println(err)
+		panic("can't continue")
+	}
+	writeBalanceToFile(atmWithSwitch(accountBalance))
+}
