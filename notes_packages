@@ -1,0 +1,41 @@
+puedo crear archivos
+por ejemplo
+
+bank.go ---> que sera el main
+y luego
+communication.go ----> donde pondre funciones auxiliares
+
+puedo agregar al principio de todo en el archivo communication.go
+package main
+indicando que pertenece al mismo paquete en el que esta bank.go
+de esta forma puedo llamar funciones sin tener que importar nada
+porque esta todo dentro del mismo paquete
+
+
+como dividir el codigo de un proyecto en multiples paquete?
+para crear un paquete, debe tener su propia subcarpeta con el mismo nombre
+por ejemplo
+package fileOps
+/fileOps
+  |---- cualquier_nombre.go
+
+
+para importarlo, hay que incluir la ruta completa
+con el nombre del modulo
+para el ejemplo de bank.go, se llama example.com
+entonces para importar en el package main, en el archivo bank.go
+tiene quer ser
+
+import (
+	"example.com/bank/fileOps"
+)
+
+
+la funciones tiene que empezar con un mayuscula para ser exportadas
+
+para instalar un paquete de un tercero tenemos que hacer
+go get ruta_del_paquete
+
+que se puede conseguir en los repositorios de go
+para importar una libreria de un tercero usamos el nombre del paquete completo 
+que le puso el tercero
