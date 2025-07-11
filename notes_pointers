@@ -1,0 +1,35 @@
+para trabajar con punteros se utiliza &
+
+por ejemplo tenemos
+age := 32
+agePointer := &age
+
+ventajas de usar punteros en go
+evitar copias innecesarias de valores
+cuando hacemos una funcion, el parametro se pasa por valor
+lo que crea un duplicado temporal. Para datos muy grandes eso puede afectar la performance
+
+
+
+se puede usar para mutar directamento los valores
+
+al pasar la direccion de memoria editamos directamente el valor en esa direccion de memoria,
+no hace falta hacer un return de los valores
+se usa menos codigo, pero tambien es mas dificil de entender el codigo
+
+para declarar el puntero de algo se hace lo siguiente
+
+var agePointer *int
+var balancePointer *float64
+var myStringPointer *string
+
+para obtener acceso al valor que hay en el puntero hay que hacer
+*myStringPointer
+
+
+fmt.Scan(&choice) ---> esta funcion usa punterosse uso en
+
+		presentOptions()
+		var choice int
+		fmt.Print("Your choice: ")
+		fmt.Scan(&choice)
