@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
 
 	"example.com/structs-class/mystructs"
 )
@@ -11,22 +10,24 @@ func main() {
 	firstName := getStringInput("Enter first name")
 	lastName := getStringInput("Enter last name")
 	birthDate := getStringInput("Enter birthDate")
-	var user mystructs.User
-	user = mystructs.User{
-		FirstName: firstName,
-		LastName:  lastName,
-		BirthDate: birthDate,
-		CreateAt:  time.Now(),
+	user, err := mystructs.New(firstName, lastName, birthDate)
+
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 
 	user.ShowUserInfo()
 	user.Clear()
 	user.ShowUserInfo()
+
+	admin := mystructs.NewAdmin("admin@boss.com", "1234", firstName, lastName, birthDate)
+	admin.ShowUserInfo()
 }
 
 func getStringInput(message string) (output string) {
 	fmt.Println(message)
-	fmt.Scan(&output)
+	fmt.Scanln(&output)
 	return output
 }
 
