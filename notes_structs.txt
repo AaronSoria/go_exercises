@@ -1,0 +1,221 @@
+coleccionamos data relacionada y la agrupamos en una sola variable
+
+para definir un struct en gose usa la palabra reservada type
+
+por ejemplo
+
+type User ---> siempre usando mayuscula en la primera letra
+
+y asi es como se declara un struct
+type User struct {
+	
+}
+
+los structs se instancian, usan un constructor
+
+por ejemplo
+
+var user User
+
+user = User {
+    field1 = "" -----------> esto se llama struct literal o composite literal
+}
+
+se puede hacer asi tambien
+	user = User{
+		firstName,
+		lastName,
+		birthDate,
+		time.Now(),
+	}
+respetando el orden de los parametros establecidos en el respectivo struct
+
+tambien puede hacerse una iniciacion vacia
+	user = User{}
+
+tenemos el siguiente caso
+func main() {
+	firstName := getStringInput("Enter first name")
+	lastName := getStringInput("Enter last name")
+	birthDate := getStringInput("Enter birthDate")
+	var user mystructs.User
+	user = mystructs.User{
+		FirstName: firstName,
+		LastName:  lastName,
+		BirthDate: birthDate,
+		CreateAt:  time.Now(),
+	}
+
+	showUserPointerInfo(&user)
+}
+
+
+func showUserPointerInfo(user *mystructs.User) {
+	fmt.Println(user.FirstName)   con el struct no hace falta tener que agregar el * para poder manipular el valor en ese puntero
+	fmt.Println(user.LastName)
+	fmt.Println(user.BirthDate)
+	fmt.Println(user.CreateAt)
+}
+
+
+
+para agregar una funcion a mi struct, se hace lo siguiente
+
+func (user User) showUserInfo() {
+	fmt.Println(user.FirstName)
+	fmt.Println(user.LastName)
+	fmt.Println(user.BirthDate)
+	fmt.Println(user.CreateAt)
+}
+
+func (user User) ---> de esta forma se especifica que quiero que esta asociada a mi struct
+se llama reciever
+
+para mutar mi struct debo hacer lo siguiente
+
+func (user *User) Clear() {
+	user.FirstName = ""
+	user.LastName = ""
+	user.BirthDate = ""
+}
+
+hay que indicarlo como si fuera un puntero, para que sea capaz de modificarse a si mismo
+
+
+constructores
+la convencion es que comiencen con new seguido del nombre del struct
+por ejemplo
+
+func NewUser(firstName, lastName, birthDate string) User {
+	return User{
+		FirstName: firstName,
+		LastName:  lastName,
+		BirthDate: birthDate,
+		CreateAt:  time.Now(),
+	}
+}
+
+puede usarse para devolver un puntero
+
+
+func NewUser(firstName, lastName, birthDate string) (*User) {
+	if firstName == "" || lastName == "" || birthDate == "" {
+		return nil ///para devolver nil el tipo de dato que se tiene que declarar debe ser un puntero
+	}
+	return &User{
+		FirstName: firstName,
+		LastName:  lastName,
+		BirthDate: birthDate,
+		CreateAt:  time.Now(),
+	}
+}
+
+
+se puede agregar validaciones en el constructor y trabajar asi
+
+func NewUser(firstName, lastName, birthDate string) (*User, error) {
+	if firstName == "" || lastName == "" || birthDate == "" {
+		return nil, errors.New("fields can't be empty")
+	}
+	return &User{
+		FirstName: firstName,
+		LastName:  lastName,
+		BirthDate: birthDate,
+		CreateAt:  time.Now(),
+	}, nil
+}
+
+
+si el constructor esta en un paquete diferente, la funcion la llamamos new
+
+
+los structs no soportan herencia pero se lo puede incrustrar, se lo puede embeber
+
+type Admin struct {
+	Email    string
+	Password string
+	User     User
+	User			/// puedo declararlo asi para exponer todo lo de user, declararlo asi se le llama anonimo
+}
+
+func NewAdmin(email, password, firstName, lastName, birthDate string) Admin {
+	return Admin{
+		Email:    email,
+		Password: password,
+		User: User{
+			FirstName: firstName,
+			LastName:  lastName,
+			CreateAt:  time.Now(),
+			BirthDate: birthDate,
+		},
+	}
+}
+
+
+uso de alias, custom types para extender metodos
+
+type customString string {
+
+
+}
+
+func (txt customString) log(){
+	fmt.Println(txt)
+}
+
+func main (){
+	var name customString
+	name.log()
+}
+
+
+para manejar entradas con multiples lineas por consola
+usamos el paquete bufio
+
+import bufio
+
+func example(){
+	bufio.NewReader(os.Stdin) // Queremos leer de la consola, por eso usamos os.Stin  que significa Standard Input 
+}
+
+ejemplo completo
+func getStringInput(message string) (input string) {
+	fmt.Println(message)
+	reader := bufio.NewReader(os.Stdin) // Queremos leer de la consola, por eso usamos os.Stin  que significa Standard Input 
+	input, err := reader.ReadString('\n') // el string ya esta en el buffer por lo que leemos el contenido hasta el caracter que se indica
+	if err != nil {
+		return ""
+	}
+
+	input = strings.TrimSuffix(input, "\n")
+	input = strings.TrimSuffix(input, "\r")
+	return input
+}
+
+
+para serializar en json se hace lo siguiente
+se importa el paquete
+import (
+	"encoding/json"
+)
+
+y luego se llama la funcion 
+
+json, err := json.Marshal(note)
+
+esto devuelve un array de bytes y un error
+
+para poder serializar un struct, las propiedades deben ser publicas es decir
+que deben empezar con mayusculas
+
+
+Para cambiar el formato de salida se usan ``
+por ejemplo
+
+type Note struct {
+	Title    string  `json:"title"`
+	Content  string  `json:"content"`
+	CreateAt time.Time `json:"createAt"`
+}
+
+a esto se le llama tags y se usan para asignar metadatos

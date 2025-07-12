@@ -6,7 +6,17 @@ import (
 	"example.com/structs-class/mystructs"
 )
 
+type customString string
+
+func (txt customString) log() {
+	fmt.Println(txt)
+}
+
 func main() {
+
+	var example customString = "Hola"
+	example.log()
+
 	firstName := getStringInput("Enter first name")
 	lastName := getStringInput("Enter last name")
 	birthDate := getStringInput("Enter birthDate")
@@ -28,7 +38,7 @@ func main() {
 func getStringInput(message string) (output string) {
 	fmt.Println(message)
 	fmt.Scanln(&output)
-	return output
+	return
 }
 
 func showUserPointerInfo(user *mystructs.User) {
