@@ -1,5 +1,5 @@
 package saver
 
 type Saver interface {
-	save()
+	SaveToJson() error
 }

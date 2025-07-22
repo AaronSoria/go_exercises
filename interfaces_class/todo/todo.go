@@ -34,3 +34,7 @@ func (note Todo) SaveToJson() error {
 func isEmpty(value string) bool {
 	return value == ""
 }
+
+func (todo Todo) Display() {
+	fmt.Println(todo.Text)
+}

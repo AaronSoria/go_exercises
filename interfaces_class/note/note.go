@@ -41,6 +41,11 @@ func (note Note) SaveToJson() error {
 	return os.WriteFile(fileName, json, 0644)
 }
 
+func (note Note) Display() {
+	fmt.Println(note.Title)
+	fmt.Println(note.Content)
+}
+
 func isEmpty(value string) bool {
 	return value == ""
 }
