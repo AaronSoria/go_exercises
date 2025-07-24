@@ -1,0 +1,130 @@
+para crear interfaces la convencion es usar sustantivos y agregarle la terminacion er
+
+save ---> saver
+update ---> updater
+call ----> caller
+
+se definen asi
+
+type saver interface{
+    save(string) ----> se define el nombre y el tipo de dato que se espera puede o no incluir el nombre del parametro
+}
+
+
+como funcionan las interfaces en go?
+
+a diferencia de otros lenguajes en los que se tiene que forzar al objeto para que implemente la interfaz
+en go, el compilador busca si lo que pasaste tiene un meteodo con el mismo nombre
+por ejemplo
+
+
+type Note struct {
+
+func (note Note) SaveToJson() error {
+	fmt.Println("saving...")
+}
+}
+
+
+type Todo struct {
+
+func (todo Note) SaveToJson() error {
+	fmt.Println("saving...")
+}
+}
+
+
+type Saver interface{
+    SaveToJson() error
+}
+
+
+luego para usar la interfaz
+
+func main() {
+	note, err := note.New(
+		getStringInput("Get note's Title"),
+		getStringInput("Get note's Content"))
+
+	todo, err := todo.New(
+		getStringInput("Get todo's Content"))
+
+	err = Save(note)   ----> el metodo esta declarado con una interfaz como parametro
+	err = Save(todo)
+
+	println("Done. :D")
+}
+
+func Save(data saver.Saver) error { ------> aqui se declara que queremos usar una interfaz
+	return data.SaveToJson()  ------> aqui el compilador se fija si lo que sea que le pasaron tiene un metodo que se llame SaveToJson
+}
+
+tiene que tienen la misma firma
+
+
+si la interfaz tiene mas de un metodo, entonces se puede llamar como se me de la gana, pero tiene que ser descriptivo
+
+puede embeber una interfaz para usarla por ejemplo
+
+type outputtable interface {
+	saver ----> interfaz enbebida
+	Display()
+}
+
+
+
+existe un tipo especial de interfaz que nos permite recibir cualquier cosa por parametro
+
+por ejemplo
+
+func doSomething(value interface{}){   //cualquier valor esta permitido
+
+}
+
+
+tambien se puede usar any
+
+func doSomething(value any){   //cualquier valor esta permitido
+
+}
+
+no es recomendable usarlo
+
+
+como manejar los types?
+para manejar los types se puede trabajar usando switch/case por ejemplo
+
+func doSomething(value interface{}){   //cualquier valor esta permitido
+	switch value.(type)
+}
+
+otra forma de trabajar cuando se espera un valor en especifico es
+func doSomethingElse(value interface{}) { //cualquier valor esta permitido
+	intValue, ok := value.(int)
+	if ok {
+		fmt.Println("es un numero")
+		fmt.Println("es un numero + 1:", intValue)
+	}
+
+	stringValue, ok := value.(string)
+	if ok {
+		fmt.Println("es un texto")
+		fmt.Println("dice esto:", stringValue)
+	}
+
+}
+
+como usar generics?
+se puede trabajar con generics en go de la siguiente manera
+
+func Add[T any](a,b T) T {
+	return a + b
+}
+
+el problema de usar any es que algunas veces no tengo operaciones definidas como es el caso de la suma
+se puede acotar los tipos a usar con generics usando pipe |
+
+
+func Add[T int|float64|string](a,b T) T {
+	return a + b
+}

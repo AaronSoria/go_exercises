@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	result := Add(1, 1) // metodo que usa generics
+	result := Add(1, 1) // metodo que usa genericsgi
 	fmt.Println("la suma es: ", result)
 	doSomethingElse("Hola prro")
 	note, err := note.New(
