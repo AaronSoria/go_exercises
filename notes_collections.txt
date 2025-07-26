@@ -1,0 +1,96 @@
+para declarar un array en go hay que hacer lo siguiente
+
+prices := [3]float64{6.3, 88.3, 11.8}    aqui se declarar que un array tiene 4 elementos del tipo float64
+
+var names [4]string
+
+prices[2] para acceder al 3er elemto
+
+para obtener una porcion del array usamos slices asi
+prices[1:4]  ---> esto significa dame los elementos que esten en prices, comenzando desde el indice 1 hasta el elemento 4, pero excluime el 4
+prices[:3] ---> muestra los primeros 3 elementos
+prices[3:] ---> muestra todo los elementos a partir del indice 3
+
+
+si hago esto
+	auxPrices := prices[3:]
+	auxPrices[1] = 0.0
+	fmt.Println(auxPrices)
+	fmt.Println(prices)
+
+se modifica el valor ranto en price como en auxPrice
+
+cuando creamos un slice, obtenemos un "window" hacia ese array, por eso se modifica
+funciona como un puntero
+
+hay dos funcionalidades
+len(prices) para saber el tamano del array, el numero de elementos dentro de nuestro array
+
+cap(auxPrices) nos permite ver cuantos elementos quedan hay en total,
+como es un slice se fija en el array original. Si se hizo un slice asi
+prices[3:]
+se pierde referencia de los elementos que quedaron a la izquierda
+
+
+arrays dinamicos
+para trabajar con arryas dinamicos, tenemos que generar un slice primero
+var prices = []float64{0.99, 1.99}   ----> como no especificamos la dimension lo que hace go es:
+crear un array y un slice asociado a ese array y regresar el slice. Si agregamos un elemto
+crea un nuevo array y asocia un nuevo slice
+
+
+para haceer un append a un slices con elementos de otro array hay que hacer lo siguiente
+
+items = append(item, newItems...)  ---> los 3 puntos indican la operacion de unpacking
+
+
+colecciones clave valor, conocida como map
+ejemplo
+webSites := map[string]string  dentro de los corchetes es la clave fuera de los corchetes es el valor
+siempre son dinamicos
+
+para agregar un nuevo elemento se tiene que hacer lo siguiente
+
+webSites["linkedin"] = "https://linkedin.com"
+
+y para eliminar
+delete(webs, "Google")
+
+
+para optimizar la creacion de slices dinamicos, se utiliza la funcion make
+userNames := make([]string, 2) de esta forma decimos que se cree un slice con su respectivo array con longitud 2
+userNames := make([]string, 2, 5) aqui se indica que la capacidad maxima del array a usar es de 5
+
+de esta forma no tiene que "allocar" mas espacio, porque ya esta reservado
+
+se usar make para los maps
+
+courseRating = map(map[string]float64, 3)
+
+los alias
+
+para hacer el codigo mas legible y que sea mas facil de escribir, se pueden usar alias
+por ejemplo esto es muy largo map[string]float64
+se le puede asignar un alias
+
+type gradings map[string]float64
+
+ y puede tener metodo asociados
+
+ func (g gradings) output() {
+	fmt.Println(g)
+ }
+
+
+
+ para recorrer los elementos de una coleccion usamos for
+ para un array es asi
+
+ for index, item := range userNames {
+
+ }
+
+
+for key, item := range courseRating {
+	fmt.Println(key, item)
+}
