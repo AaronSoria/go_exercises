@@ -94,3 +94,65 @@ type gradings map[string]float64
 for key, item := range courseRating {
 	fmt.Println(key, item)
 }
+
+
+se pueden usar alias para las funciones
+type intTransformation func(int) int
+
+
+se pueden pasar funciones genericas como parametros
+func transformAllNumbers[T int | float64](numbers *[]T, transformation func(T) T) []T {
+	newNumbers := make([]T, len(*numbers))
+	for index, item := range *numbers {
+		newNumbers[index] = transformation(item)
+	}
+
+	return newNumbers
+}
+
+no se puede hacer esto
+type globalTransformation func[T int | float64](T) T
+
+el mensaje dice que los function type no tienen que
+tener parametros type
+
+se puede devolver funciones como resultado
+func getOperation() intTransformation {
+	return double
+}
+
+
+y asi es como se usa una funcion anonima
+result := transformNumbers(&collection, func(x int) int { return x * 4 })
+
+se puden crear y devolver funciones anonimias por ejemplo 
+func createTransformation(factor int) func(int) int {
+	return func (number int) int {
+		return number * factor
+	}
+}
+
+esto es un patron que se llama function factory
+
+las funciones que yo cree usando diferente valores para factor no haran que se modifiquen 
+las creaciones anteriores, eso se le llama clousure
+
+variadic functions
+func sumup(numbers ...int) int {
+	sum := 0
+	for _, val := range numbers {
+		sum += val
+	}
+
+	return sum
+}
+
+es el equivalente a params en c#
+
+cuando espero una coleccion de valores pero 
+que no necessariamente esten declarados como
+un array
+y se llama asi
+
+	sumup(10, 20, 30, 40)
+	sumup(result3...)
