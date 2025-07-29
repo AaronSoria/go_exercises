@@ -1,0 +1,204 @@
+se pueden correr tareas concurrentes usando go rutines
+esto ayuda a que las tareas tambien se ejecuten en "paralelo"
+
+ejecucion secuencial
+
+func main() {
+	greet("hola")
+	greet("tarolas")
+	slowGreet("estoy pensando")
+	greet("tengo hambre")
+}
+
+no hay dependecia de datos de una de otras, por lo que se pueden ejecutar en paralelo
+usando la palabra reservada go, asi:
+func main() {
+	go greet("hola")
+	go greet("tarolas")
+	go slowGreet("estoy pensando")
+	go greet("tengo hambre")
+}
+
+se vuelven gorutines
+
+para establecer comunicacion entre rutinas y con el main, se utliza un channel, es un dispositivo de comunicacion
+se declara asi
+
+make(chan bool)
+
+puede ser cualquier valor, incluso un struct
+
+func main() {
+	go greet("hola")
+	go greet("tarolas")
+	done := make(chan bool)
+	go slowGreet("estoy pensando", done)
+	go greet("tengo hambre")
+	<- done
+}
+
+
+func greet(phrase string) {
+	fmt.Println("Hello you said: ", phrase)
+}
+
+func slowGreet(phrase string, doneChannel chan bool) {
+	time.Sleep(3 * time.Second)
+	fmt.Println("Hello you said: ", phrase)
+	doneChannel <- true
+}
+
+
+para asignar un valor al channel se hace asi
+doneChannel <- true   // esto significa que los datos fluyen hacia el canal
+
+	done := make(chan bool)
+	go slowGreet("estoy pensando", done)
+	go greet("tengo hambre")
+	<- done  /// asi leemos lo que hay en el canal, estamos esperando que el ganal emita datos
+
+    // tambien se puede imprimir
+    fmt.Println(<- done)
+
+
+se puede usar un solo channel para multiples gorutines
+
+func main() {
+	done := make(chan bool)
+	go greet("hola", done)
+	go greet("tarolas", done)
+	go slowGreet("estoy pensando", done)
+	go greet("tengo hambre", done)
+	<-done
+}
+
+func greet(phrase string, doneChannel chan bool) {
+	fmt.Println("Hello you said: ", phrase)
+	doneChannel <- true
+}
+
+func slowGreet(phrase string, doneChannel chan bool) {
+	time.Sleep(3 * time.Second)
+	fmt.Println("Hello you said: ", phrase)
+	doneChannel <- true
+}
+
+
+pero de esta forma se produce una condicion de carrera
+y ek primero en terminar la tarea, bloquea el canal a los demas.
+Se puede solucionar asi
+
+func main() {
+	done := make(chan bool)
+	go greet("hola", done)
+	go greet("tarolas", done)
+	go slowGreet("estoy pensando", done)
+	go greet("tengo hambre", done)
+	<-done
+    <-done
+    <-done
+    <-done
+}
+
+esto no es escalable, se pude crear un buffer
+en donde se carguen los resultados
+Y se puede hacer asi:
+
+func main() {
+	dones := make([]chan bool, 4)
+	dones[0] = make(chan bool)
+	go greet("hola", dones[0])
+	dones[1] = make(chan bool)
+	go greet("tarolas", dones[1])
+	dones[2] = make(chan bool)
+	go slowGreet("estoy pensando", dones[2])
+	dones[3] = make(chan bool)
+	go greet("tengo hambre", dones[3])
+
+	for _, item := range dones {
+		<-item
+	}
+}
+
+
+Go ofrece otra alternativa aun mas sencilla
+func main() {
+	done := make(chan bool)
+	go greet("hola", done)
+	go greet("tarolas", done)
+	go slowGreet("estoy pensando", done)
+	go greet("tengo hambre", done)
+
+	for range done {
+	}
+}
+
+el problema es que el canal queda abierto
+y no se sabe cuando se cierra
+
+func slowGreet(phrase string, doneChannel chan bool) {
+	time.Sleep(3 * time.Second)
+	fmt.Println("Hello you said: ", phrase)
+	doneChannel <- true
+	close(doneChannel)
+}
+
+se puede cerrar el canal,
+pero no se sabe con certeza cual sera la ultima operacion en cerrarlo
+
+si tenemos multiples canales, puede ocurrir un error
+porque el programa espera por algo que nunca ocurre.
+
+
+func main() {
+	taxRates := []float64{0, 0.07, 0.1, 0.15}
+	doneChans := make([]chan bool, len(taxRates))
+	errorChans := make([]chan error, len(taxRates))
+
+	for index, taxRate := range taxRates {
+		doneChans[index] = make(chan bool)
+		errorChans[index] = make(chan error)
+		fm := filemanager.New("prices.txt", fmt.Sprintf("result_%.0f.json", taxRate*100))
+		// cmdm := cmdmanager.New()
+		priceJob := prices.NewTaxIncludedPriceJob(fm, taxRate)
+		go priceJob.Process(doneChans[index], errorChans[index])
+
+		// if err != nil {
+		// 	fmt.Println("Could not process job")
+		// 	fmt.Println(err)
+		// }
+	}
+
+	for index := range errorChans {
+        <-errorChans[index]
+	}
+
+	for index := range taxRates {
+        <-doneChans[index]
+	}
+}
+
+
+es por ello que se puede utilizar una estructura especial
+usar select
+
+funciona como un switch, pero exclusivo de channels
+
+	for index := range taxRates {
+		select {
+		case err := <-errorChans[index]:
+			if err != nil {
+				fmt.Println(err)
+			}
+		case <-doneChans[index]:
+			fmt.Println("Done!")
+		}
+	}
+
+la palabra reservada defer, se utiliza cuando quiero ejecutar algo al final de toda mi logica
+por ejemplo cerrar un archivo, ya sea porque he terminado de leerlo o porque hubo un error en la lactura
+simplemente hay que hacer
+
+defer  file.Close()
+
+defer do_something()
