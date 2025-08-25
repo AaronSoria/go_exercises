@@ -1,0 +1,60 @@
+tenemos el codigo
+
+package main
+
+import "errors"
+
+func main() {
+	result, err := divide(x,y)
+}
+
+func divide (x,y float64 ) (float64, error) {
+	var result float64
+
+	if y == 0 {
+		return result, errors.New("Cannot divide by 0")
+	}
+
+	return x/y, nil
+}
+
+y luego las pruebas, 
+que deben ser nombradas nombreArchivo_test.go
+
+
+asi se estrucutran las pruebas
+
+package main
+import "testing"
+
+func TestDivide(t *testing.T){
+	 _, err:= divide(10.1, 1.0)
+	 if err != nil {
+		t.Error("Got an error")
+	 }
+}
+
+
+asi se corren las pruebas 
+
+go test
+go test -v
+
+
+se puede crear un struct paraa testear las pruebas
+por ejemplo
+
+var tests = []struct {
+    name string
+    divident float64
+    divisor float64
+    expected float64
+    isErr bool
+}{
+    {"valid-data", 100.0, 10.0, 10.0, false}
+    {"invalid-data", 100.0, 0.0, 0.0, true}
+}
+
+
+se puede ver el coverage corren
+go test -cover
