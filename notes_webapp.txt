@@ -1,0 +1,32 @@
+go tiene para manejar un servidor web de forma nativa
+
+el paquete 
+net/http
+
+por ejemplo
+
+func main(){
+
+	http.HandleFunc("/", func(w http.ResponseWritter, r *http.Request){
+		n, err := fmt.Fprintf(w, "hello world")
+		if err != nil {
+			fmt.Println("err")
+		}
+		fmt.Println(fmt.Sprintf("number of bytes written: %d", n))
+	})
+
+	_ = http.ListenAndServe(":8080", nil)
+}
+
+
+http.HandleFunc("/", ...) ---> esto se usa para gestionar las rutas
+
+http.HandleFunc("/users", getUsers)
+http.HandleFunc("/about", about)
+
+
+para comentar y documentar
+la convencion en go es
+
+//nombre_funcion  descripcion de lo que hace
+func nombre_funcion() {...}
